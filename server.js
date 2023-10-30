@@ -433,7 +433,6 @@ bot.command("start", async (ctx) => {
       referral = code;
     }
     await ctx.scene.enter("apply for airdrop");
-    console.log(referralData);
   } else {
     await ctx.reply(
       "We will verifiy your information and get back to you \n\nAirdrop completed ✅: \n• Enter the drop telegram bot ✅ \n• Follow Astro social media ✅ \n• Register and Submit your wallet ✅\n\nGo to /profile to see your info"
@@ -449,11 +448,34 @@ bot.command("profile", async (ctx) => {
     .eq("chat_id", chat_id)
     .single();
   console.log(data);
-  ctx.replyWithHTML(
-    `<b>My Profile 🏆</b>\n\n$ABC Balance: ${data.ABC}ABC = $${data.ABC * 0.002}\n\nName: ${data.user_name}\nTwitter: ${data.twitter_handle}\nEmail: ${data.email_address}\nAstro id: ${data.astro_id}\nWallet:${data.wallet}\n\n<b>Referral</b>\nNo of Referrals: ${data.referral_count}\nReferral Code: https://t.me/astrobuxbot?start=r${data.chat_id}\n<i>Refer more friends and earn 500ABC = $1</i>`
-  );
+  if (data != null) {
+    ctx.replyWithHTML(
+      `<b>My Profile 🏆</b>\n\n$ABC Balance: ${data.ABC}ABC = $${
+        data.ABC * 0.002
+      }\n\nName: ${data.user_name}\nTwitter: ${data.twitter_handle}\nEmail: ${
+        data.email_address
+      }\nAstro id: ${data.astro_id}\nWallet:${
+        data.wallet
+      }\n\n<b>Referral</b>\nNo of Referrals: ${
+        data.referral_count
+      }\nReferral Code: https://t.me/astrobuxbot?start=r${
+        data.chat_id
+      }\n<i>Refer more friends and earn 500ABC = $1</i>`
+    );
+  } else {
+    await ctx.scene.enter("apply for airdrop");
+  }
 });
 
+bot.command("listingproof", async (ctx) => {
+  const Bitmart =
+    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/BitMart%20-%20Token%20Listing%20Agreement%20Addendum%20-%20ABC%202023%20SIGNED.pdf";
+  const Coinstore =
+    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/Coinstore%20Listing%20Agreement_ASTROBUX.docx.pdf";
+  ctx.replyWithHTML("ℹ Here are the <b>Proof that we are Listing!!!🥳🎉</b> ⬇");
+  ctx.replyWithDocument(Bitmart);
+  ctx.replyWithDocument(Coinstore);
+});
 bot.launch();
 // app.listen(3000, () => {
 //   console.log("listening at 3000");
