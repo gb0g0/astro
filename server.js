@@ -16,13 +16,15 @@ const supabaseUrl = process.env.supabaseUrl;
 const supabaseKey = process.env.supabaseKey;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+let referral;
+
 const applyForAirdrop = new WizardScene(
   "apply for airdrop",
   async (ctx) => {
-    ctx.replyWithHTML(
+    await ctx.replyWithHTML(
       `Hey ${ctx.chat.username}, Welcome again to <b>Astro Airdrop Bot</b>.\nComplete all steps to be eligbe.\nNote all information you provide will be verified manually`
     );
-    ctx.replyWithHTML(
+    await ctx.replyWithHTML(
       "Step 1: \n\nClick on the Link below to follow <b>Astro</b> on X (fka Twitter). \n\nFollow Astro: 👇 \nhttps://twitter.com/Astroecosystem",
       {
         reply_markup: {
@@ -333,6 +335,8 @@ const applyForAirdrop = new WizardScene(
     const email_address = ctx.wizard.state.email;
     const wallet = ctx.wizard.state.wallet;
     const astro_id = ctx.wizard.state.socratesId;
+    const code = referral;
+
     if (ctx.callbackQuery == undefined) {
       ctx.answerCbQuery();
       ctx.reply("Wrong Input.....");
@@ -353,19 +357,35 @@ const applyForAirdrop = new WizardScene(
         },
       ]);
 
+      const { data: referralData, error: referralError } = await supabase
+        .from("user")
+        .select()
+        .eq("chat_id", code);
+
       if (error) {
         console.log(error);
         ctx.reply("An error occured 😔, Please try again 🔁");
         await ctx.scene.leave();
         await ctx.scene.enter("apply for airdrop");
       } else {
+        if (referralData != null) {
+          const message = `ℹ You just Referred @${ctx.chat.username}\nYou Earned 500ABC = $1 🥳`;
+          const ABC = referralData[0].ABC + 500;
+          const referral_count = referralData[0].referral_count + 1;
+          const { data, error } = await supabase
+            .from("user")
+            .update({ referral_count, ABC })
+            .eq("chat_id", referralData[0].chat_id)
+            .select();
+          await bot.telegram.sendMessage(referralData[0].chat_id, message);
+        }
         await ctx.reply(
-          "Woohoo 🎉🥳,\nYou have been added to the list! 📝✅ \n\nWe will verifiy your information and get back to you \n\nAirdrop completed ✅: \n• Enter the drop telegram bot ✅ \n• Follow Astro social media ✅ \n• Register and Submit your wallet ✅"
+          "Woohoo 🎉🥳,\nYou have been added to the list! 📝✅ \n\nWe will verifiy your information and get back to you \n\nAirdrop completed ✅: \n• Enter the drop telegram bot ✅ \n• Follow Astro social media ✅ \n• Register and Submit your wallet ✅\n\nGo to /profile to see your info"
         );
 
-        await ctx.reply(
-          `Your Information: \n\n Username:${user_name} \n X handle: ${twitter_handle} \n Email address: ${email_address} \n Wallet: ${wallet}`
-        );
+        // await ctx.reply(
+        //   `Your Information: \n\n Username:${user_name} \n X handle: ${twitter_handle} \n Email address: ${email_address} \n Wallet: ${wallet}`
+        // );
         ctx.scene.leave();
       }
     }
@@ -374,23 +394,8 @@ const applyForAirdrop = new WizardScene(
 
 // const menu = new WizardScene("menu options", async (ctx) => {
 //   await ctx.reply(
-//     "Step 1: \n\nClick on the Link below to follow *Socrates* on X (fka Twitter). \n\nFollow Socrates: 👇 \nhttps://twitter.com/Socrates_xyz",
-//     {
-//       reply_markup: {
-//         inline_keyboard: [
-//           [
-//             {
-//               text: "Done ✅",
-//               callback_data: "Next",
-//             },
-//             {
-//               text: "Restart 🔁",
-//               callback_data: "Restart",
-//             },
-//           ],
-//         ],
-//       },
-//     }
+//     "hey"
+
 //   );
 //   //   ctx.wizard.cursor = 0;
 //   //   return ctx.wizard.next();
@@ -407,33 +412,46 @@ bot.use(stage.middleware());
 stage.register(applyForAirdrop);
 
 // const menus = new Stage([menu], { sessionName: "chatSession" });
-
 // bot.use(menus.middleware());
 // menus.register(menu);
 
 bot.command("start", async (ctx) => {
   const chat_id = ctx.chat.id;
-  const { data, error } = await supabase
+  const referral_code = ctx.payload;
+  const code = referral_code.replace(/r/g, "");
+  const { data: userData, error } = await supabase
     .from("user")
     .select()
     .eq("chat_id", chat_id);
-  if (error) {
-    console.log(error);
+  if (userData.length == 0) {
+    const { data: referralData, error } = await supabase
+      .from("user")
+      .select()
+      .eq("chat_id", code);
+    if (referralData != null) {
+      await ctx.reply(`ℹ Referred by ${referralData[0].user_name}`);
+      referral = code;
+    }
     await ctx.scene.enter("apply for airdrop");
-  }
-
-  if (data.length == 0) {
-    await ctx.scene.enter("apply for airdrop");
+    console.log(referralData);
   } else {
-    // ctx.reply("Wait i'm still building");
     await ctx.reply(
-      "We will verifiy your information and get back to you \n\nAirdrop completed ✅: \n• Enter the drop telegram bot ✅ \n• Follow Astro social media ✅ \n• Register and Submit your wallet ✅"
+      "We will verifiy your information and get back to you \n\nAirdrop completed ✅: \n• Enter the drop telegram bot ✅ \n• Follow Astro social media ✅ \n• Register and Submit your wallet ✅\n\nGo to /profile to see your info"
     );
   }
 });
-bot.command("menu", async (ctx) => {
-  //   ctx.scene.enter("menu options");
-  //   ctx.reply("Wait i'm still building");
+bot.command("profile", async (ctx) => {
+  const chat_id = ctx.chat.id;
+
+  const { data, error } = await supabase
+    .from("user")
+    .select()
+    .eq("chat_id", chat_id)
+    .single();
+  console.log(data);
+  ctx.replyWithHTML(
+    `<b>My Profile 🏆</b>\n\n$ABC Balance: ${data.ABC}ABC = $${data.ABC * 0.002}\n\nName: ${data.user_name}\nTwitter: ${data.twitter_handle}\nEmail: ${data.email_address}\nAstro id: ${data.astro_id}\nWallet:${data.wallet}\n\n<b>Referral</b>\nNo of Referrals: ${data.referral_count}\nReferral Code: https://t.me/astrobuxbot?start=r${data.chat_id}\n<i>Refer more friends and earn 500ABC = $1</i>`
+  );
 });
 
 bot.launch();
