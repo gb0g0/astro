@@ -476,6 +476,11 @@ bot.command("listingproof", async (ctx) => {
   ctx.replyWithDocument(Bitmart);
   ctx.replyWithDocument(Coinstore);
 });
+bot.command("socials", async (ctx) => {
+  ctx.replyWithHTML(
+    "🔗 Socials\n<a href='https://twitter.com/Astroecosystem'>Twitter</a> <a href='https://astrobuxcoin.com'>Website</a> <a href='https://t.me/Astrobrandglobalworldwide'>Telegram</a>"
+  );
+});
 bot.launch();
 // app.listen(3000, () => {
 //   console.log("listening at 3000");
