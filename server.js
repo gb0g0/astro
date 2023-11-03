@@ -28,7 +28,8 @@ const applyForAirdrop = new WizardScene(
       "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/500x500--2.gif";
     const msg =
       "🩸 New Airdrop: Astro Bux Coin\n💰 Reward: 5000 ABC(~10$)\n📊 Market: Binance & 30+ More\n👥 Per Refer: 500 ABC\n📣 Rating: ⭐️⭐️⭐️⭐️⭐️\n⌛️ Distribution: Instant\n\n📝 How to join ?\n\n🔹 Start Airdrop Bot\n🔹 Join Our Telegram Channels\n🔹 Submit Your Wallet Address\n🔹 Do Some Refers\n🔹 Wait For Drop Annoucement\n\nComplete all steps to be eligbe. Note all information you provide will be verified manually\n\n🔗 Socials\nTwitter: https://x.com/Astroecosystem\nWebsite: https://astrobuxcoin.com\nTelegram: https://t.me/Astrobrandglobalworldwide";
-    await ctx.replyWithPhoto({ source: imageUrl }, { caption: msg });
+    // await ctx.replyWithPhoto({ source: imageUrl }, { caption: msg });
+    await bot.telegram.sendPhoto(ctx.chat.id, imageUrl, msg)
     await ctx.replyWithHTML(
       "Step 1: \n\nClick on the Link below to follow <b>Astro</b> on X (fka Twitter). \n\nFollow Astro: 👇 \nhttps://twitter.com/Astroecosystem",
       {
