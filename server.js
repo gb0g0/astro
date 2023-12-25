@@ -475,9 +475,9 @@ bot.command("profile", async (ctx) => {
 
 bot.command("listingproof", async (ctx) => {
   const Bitmart =
-    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/BitMart%20-%20Token%20Listing%20Agreement%20Addendum%20-%20ABC%202023%20SIGNED.pdf";
+    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/BitMart%20-%20Token%20Listing%20Agreement%20Addendum%20-%20ABC%202023%20SIGNED..pdf";
   const Coinstore =
-    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/Coinstore%20Listing%20Agreement_ASTROBUX.docx.pdf";
+    "https://ymdgochptxxzgedhddid.supabase.co/storage/v1/object/public/Astro/Coinstore%20Listing%20Agreement%20ASTROBUX.docx.pdf";
   ctx.replyWithHTML("ℹ Here are the <b>Proof that we are Listing!!!🥳🎉</b> ⬇");
   ctx.replyWithDocument(Bitmart);
   ctx.replyWithDocument(Coinstore);
